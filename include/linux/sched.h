@@ -825,7 +825,9 @@ struct signal_struct {
 
 #endif
 
+	/* PID/PID hash table linkage. */
 	struct pid *leader_pid;
+	struct pid *pids[PIDTYPE_MAX];
 
 #ifdef CONFIG_NO_HZ_FULL
 	atomic_t tick_dep_mask;
@@ -1861,7 +1863,8 @@ struct task_struct {
 	struct list_head ptrace_entry;
 
 	/* PID/PID hash table linkage. */
-	struct pid_link pids[PIDTYPE_MAX];
+	struct pid			*thread_pid;
+	struct hlist_node		pid_links[PIDTYPE_MAX];
 	struct list_head thread_group;
 	struct list_head thread_node;
 
@@ -2311,7 +2314,7 @@ static inline bool should_numa_migrate_memory(struct task_struct *p,
 
 static inline struct pid *task_pid(struct task_struct *task)
 {
-	return task->pids[PIDTYPE_PID].pid;
+	return task->thread_pid;
 }
 
 static inline struct pid *task_tgid(struct task_struct *task)
@@ -2320,18 +2323,18 @@ static inline struct pid *task_tgid(struct task_struct *task)
 }
 
 /*
- * Without tasklist or rcu lock it is not safe to dereference
+ * Without tasklist or RCU lock it is not safe to dereference
  * the result of task_pgrp/task_session even if task == current,
  * we can race with another thread doing sys_setsid/sys_setpgid.
  */
 static inline struct pid *task_pgrp(struct task_struct *task)
 {
-	return task->group_leader->pids[PIDTYPE_PGID].pid;
+	return task->signal->pids[PIDTYPE_PGID];
 }
 
 static inline struct pid *task_session(struct task_struct *task)
 {
-	return task->group_leader->pids[PIDTYPE_SID].pid;
+	return task->signal->pids[PIDTYPE_SID];
 }
 
 struct pid_namespace;
@@ -2444,7 +2447,7 @@ static inline pid_t task_pgrp_nr(struct task_struct *tsk)
  */
 static inline int pid_alive(const struct task_struct *p)
 {
-	return p->pids[PIDTYPE_PID].pid != NULL;
+	return p->thread_pid != NULL;
 }
 
 /**
@@ -3387,9 +3390,12 @@ static inline int get_nr_threads(struct task_struct *tsk)
 static inline
 struct pid *task_pid_type(struct task_struct *task, enum pid_type type)
 {
-	if (type != PIDTYPE_PID)
-		task = task->group_leader;
-	return task->pids[type].pid;
+	struct pid *pid;
+	if (type == PIDTYPE_PID)
+		pid = task_pid(task);
+	else
+		pid = task->signal->pids[type];
+	return pid;
 }
 
 static inline bool thread_group_leader(struct task_struct *p)
