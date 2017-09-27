@@ -68,6 +68,7 @@ struct bpf_map {
 #ifdef CONFIG_SECURITY
 	void *security;
 #endif
+	u8 name[BPF_OBJ_NAME_LEN];
 };
 
 /* function argument constraints */
