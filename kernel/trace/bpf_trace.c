@@ -531,8 +531,8 @@ __bpf_perf_event_output(struct pt_regs *regs, struct bpf_map *map,
 
 	perf_sample_data_init(&sample_data, 0, 0);
 	sample_data.raw = raw;
-	perf_event_output(event, &sample_data, regs);
-	return 0;
+
+	return perf_event_output(event, &sample_data, regs);
 }
 
 BPF_CALL_5(bpf_perf_event_output, struct pt_regs *, regs, struct bpf_map *, map,
