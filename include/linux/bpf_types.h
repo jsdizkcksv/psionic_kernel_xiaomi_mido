@@ -9,12 +9,14 @@ BPF_PROG_TYPE(BPF_PROG_TYPE_SCHED_ACT, tc_cls_act,
 	      struct __sk_buff, struct sk_buff)
 BPF_PROG_TYPE(BPF_PROG_TYPE_XDP, xdp,
 	      struct xdp_md, struct xdp_buff)
+#ifdef CONFIG_CGROUP_BPF
 BPF_PROG_TYPE(BPF_PROG_TYPE_CGROUP_SKB, cg_skb,
 	      struct __sk_buff, struct sk_buff)
 BPF_PROG_TYPE(BPF_PROG_TYPE_CGROUP_SOCK, cg_sock,
 	      struct bpf_sock, struct sock)
 BPF_PROG_TYPE(BPF_PROG_TYPE_CGROUP_SOCK_ADDR, cg_sock_addr,
 	      struct bpf_sock_addr, struct bpf_sock_addr_kern)
+#endif
 BPF_PROG_TYPE(BPF_PROG_TYPE_LWT_IN, lwt_in,
 	      struct __sk_buff, struct sk_buff)
 BPF_PROG_TYPE(BPF_PROG_TYPE_LWT_OUT, lwt_out,
