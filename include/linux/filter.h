@@ -549,7 +549,8 @@ struct bpf_prog {
 				dst_needed:1,	/* Do we need dst entry? */
 				blinded:1,	/* Was blinded */
 				is_func:1,	/* program is a bpf function */
-				xdp_adjust_head:1; /* Adjusting pkt head? */
+				xdp_adjust_head:1, /* Adjusting pkt head? */
+				enforce_expected_attach_type:1; /* Enforce expected_attach_type checking at attach time */
 	kmemcheck_bitfield_end(meta);
 	enum bpf_prog_type	type;		/* Type of BPF program */
 	enum bpf_attach_type	expected_attach_type; /* For some prog types */
