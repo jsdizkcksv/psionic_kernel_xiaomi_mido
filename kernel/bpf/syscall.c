@@ -31,12 +31,13 @@
 
 #define BPF_OBJ_FLAG_MASK   (BPF_F_RDONLY | BPF_F_WRONLY)
 
-#define IS_FD_ARRAY(map) ((map)->map_type == BPF_MAP_TYPE_PROG_ARRAY || \
-			   (map)->map_type == BPF_MAP_TYPE_PERF_EVENT_ARRAY || \
-			   (map)->map_type == BPF_MAP_TYPE_CGROUP_ARRAY || \
-			   (map)->map_type == BPF_MAP_TYPE_ARRAY_OF_MAPS)
+#define IS_FD_ARRAY(map) ((map)->map_type == BPF_MAP_TYPE_PERF_EVENT_ARRAY || \
+			  (map)->map_type == BPF_MAP_TYPE_CGROUP_ARRAY || \
+			  (map)->map_type == BPF_MAP_TYPE_ARRAY_OF_MAPS)
+#define IS_FD_PROG_ARRAY(map) ((map)->map_type == BPF_MAP_TYPE_PROG_ARRAY)
 #define IS_FD_HASH(map) ((map)->map_type == BPF_MAP_TYPE_HASH_OF_MAPS)
-#define IS_FD_MAP(map) (IS_FD_ARRAY(map) || IS_FD_HASH(map))
+#define IS_FD_MAP(map) (IS_FD_ARRAY(map) || IS_FD_PROG_ARRAY(map) || \
+			IS_FD_HASH(map))
 
 DEFINE_PER_CPU(int, bpf_prog_active);
 static DEFINE_IDR(prog_idr);
@@ -864,7 +865,7 @@ static int map_lookup_elem(union bpf_attr *attr)
 	} else if (map->map_type == BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE) {
  		err = bpf_percpu_cgroup_storage_update(map, key, value,
  						       attr->flags);
-	} else if (IS_FD_ARRAY(map)) {
+	} else if (IS_FD_ARRAY(map) || IS_FD_PROG_ARRAY(map)) {
 		err = bpf_fd_array_map_lookup_elem(map, key, value);
 	} else if (IS_FD_HASH(map)) {
 		err = bpf_fd_htab_map_lookup_elem(map, key, value);
@@ -976,6 +977,10 @@ static int map_update_elem(union bpf_attr *attr)
 		   map->map_type == BPF_MAP_TYPE_SOCKMAP) {
 		err = map->ops->map_update_elem(map, key, value, attr->flags);
 		goto out;
+	} else if (IS_FD_PROG_ARRAY(map)) {
+		err = bpf_fd_array_map_update_elem(map, f.file, key, value,
+						   attr->flags);
+		goto out;
 	}
 
 	/* Need to create a kthread, thus must support schedule */
@@ -1062,6 +1067,9 @@ static int map_delete_elem(union bpf_attr *attr)
 
 	if (bpf_map_is_dev_bound(map)) {
 		err = bpf_map_offload_delete_elem(map, key);
+		goto out;
+	} else if (IS_FD_PROG_ARRAY(map)) {
+		err = map->ops->map_delete_elem(map, key);
 		goto out;
 	}
 
