@@ -1541,11 +1541,6 @@ union bpf_attr {
  * 		restricted to raw_tracepoint bpf programs.
  * 	Return
  * 		0 on success, or a negative error in case of failure.
- * struct tcp6_sock *bpf_skc_to_tcp6_sock(void *sk)
- *	Description
- *		Dynamically cast a *sk* pointer to a *tcp6_sock* pointer.
- *	Return
- *		*sk* if casting is valid, or NULL otherwise.
  *
  * u64 bpf_ringbuf_query(void *ringbuf, u64 flags)
  *	Description
@@ -1562,6 +1557,29 @@ union bpf_attr {
  *	Return
  *		Requested value, or 0, if flags are not recognized.
  *
+ * struct tcp6_sock *bpf_skc_to_tcp6_sock(void *sk)
+ *	Description
+ *		Dynamically cast a *sk* pointer to a *tcp6_sock* pointer.
+ *	Return
+ *		*sk* if casting is valid, or NULL otherwise.
+ *
+ * struct tcp_sock *bpf_skc_to_tcp_sock(void *sk)
+ *	Description
+ *		Dynamically cast a *sk* pointer to a *tcp_sock* pointer.
+ *	Return
+ *		*sk* if casting is valid, or NULL otherwise.
+ *
+ * struct tcp_timewait_sock *bpf_skc_to_tcp_timewait_sock(void *sk)
+ * 	Description
+ *		Dynamically cast a *sk* pointer to a *tcp_timewait_sock* pointer.
+ *	Return
+ *		*sk* if casting is valid, or NULL otherwise.
+ *
+ * struct tcp_request_sock *bpf_skc_to_tcp_request_sock(void *sk)
+ * 	Description
+ *		Dynamically cast a *sk* pointer to a *tcp_request_sock* pointer.
+ *	Return
+ *		*sk* if casting is valid, or NULL otherwise.
  */
 #define __BPF_FUNC_MAPPER(FN)		\
 	FN(unspec),			\
@@ -1700,7 +1718,10 @@ union bpf_attr {
 	FN(ringbuf_discard),		\
 	FN(ringbuf_query),		\
 	FN(csum_level),			\
-	FN(skc_to_tcp6_sock),
+	FN(skc_to_tcp6_sock),		\
+	FN(skc_to_tcp_sock),		\
+	FN(skc_to_tcp_timewait_sock),	\
+	FN(skc_to_tcp_request_sock),
 
 /* integer value in 'imm' field of BPF_CALL instruction selects which helper
  * function eBPF program intends to call
