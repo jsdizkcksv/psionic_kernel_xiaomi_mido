@@ -4224,6 +4224,11 @@ static int check_helper_call(struct bpf_verifier_env *env, int func_id, int insn
 		verbose(env, "cannot call GPL-restricted function from non-GPL compatible program\n");
 		return -EINVAL;
 	}
+	
+	if (fn->allowed && !fn->allowed(env->prog)) {
+		verbose(env, "helper call is not allowed in probe\n");
+		return -EINVAL;
+	}
 
 	changes_data = bpf_helper_changes_pkt_data(fn->func);
 
