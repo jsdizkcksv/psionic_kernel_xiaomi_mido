@@ -45,7 +45,6 @@ struct dump_ping_pong_state {
 	struct vfe_device *vfe_dev;
 };
 
-void msm_isp_dump_ping_pong_mismatch(void);
 void msm_isp_get_status(struct vfe_device *vfe_dev,
 	uint32_t *irq_status0, uint32_t *irq_status1);
 void msm_isp_dump_taskelet_debug(void);
