@@ -142,4 +142,10 @@ struct perf_event_security_struct {
 
 extern unsigned int selinux_checkreqprot;
 
+static inline struct inode_security_struct *selinux_inode(
+						const struct inode *inode)
+{
+	return inode->i_security;
+}
+
 #endif /* _SELINUX_OBJSEC_H_ */
