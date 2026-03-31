@@ -26,6 +26,7 @@
 #include <linux/bsearch.h>
 #include <linux/sort.h>
 #include <linux/ctype.h>
+#include <linux/btf_ids.h>
 
 #include "disasm.h"
 
