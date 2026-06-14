@@ -315,12 +315,6 @@ static void msm_restart_prepare(const char *cmd)
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_WARM_RESET);
 	else
 		qpnp_pon_system_pwr_off(PON_POWER_OFF_HARD_RESET);	
-	
-	qpnp_pon_set_restart_reason(
-           PON_RESTART_REASON_RECOVERY);
-        __raw_writel(0x77665502, restart_reason);
-	flush_cache_all();
-	return;
 
 	if (in_panic) {
 		// Reboot to recovery
@@ -331,11 +325,7 @@ static void msm_restart_prepare(const char *cmd)
 	}
 
 	if (cmd != NULL) {
-		if (!strncmp(cmd, "bootloader", 10)) {
-			qpnp_pon_set_restart_reason(
-				PON_RESTART_REASON_BOOTLOADER);
-			__raw_writel(0x77665500, restart_reason);
-		} else if (!strncmp(cmd, "recovery", 8)) {
+		if (!strncmp(cmd, "bootloader", 10) || !strncmp(cmd, "recovery", 8)) {
 			qpnp_pon_set_restart_reason(
 				PON_RESTART_REASON_RECOVERY);
 			__raw_writel(0x77665502, restart_reason);
