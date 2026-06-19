@@ -6000,8 +6000,8 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 		    !sanitize_speculative_path(env, insn, *insn_idx + 1,
 					       *insn_idx))
 			return -EFAULT;
-			*insn_idx += insn->off;
-			return 0;
+		*insn_idx += insn->off;
+		return 0;
 		} else if (pred == 0) {
 		/* Only follow the fall-through branch, since that's where the
 		 * program will go. If needed, push the goto branch for
@@ -6012,7 +6012,7 @@ static int check_cond_jmp_op(struct bpf_verifier_env *env,
 					       *insn_idx + insn->off + 1,
 					       *insn_idx))
 			return -EFAULT;
-			return 0;
+		return 0;
 		}
 	}
 
