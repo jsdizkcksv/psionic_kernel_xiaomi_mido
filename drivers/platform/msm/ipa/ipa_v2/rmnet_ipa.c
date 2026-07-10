@@ -1073,9 +1073,9 @@ static int ipa_wwan_change_mtu(struct net_device *dev, int new_mtu)
  * later
  * -EFAULT: Error while transmitting the skb
  */
-static netdev_tx_t ipa_wwan_xmit(struct sk_buff *skb, struct net_device *dev)
+static int ipa_wwan_xmit(struct sk_buff *skb, struct net_device *dev)
 {
-	netdev_tx_t ret = NETDEV_TX_OK;
+	int ret = 0;
 	bool qmap_check;
 	struct wwan_private *wwan_ptr = netdev_priv(dev);
 	struct ipa_tx_meta meta;
